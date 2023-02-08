@@ -36,3 +36,44 @@
     display: flex;
     justify-content: center;
 }
+
+.conc{
+    margin: 10px;
+    padding: 10px;
+    border: 3px solid rgb(140, 140, 245);
+}
+
+.all-form-cards {
+    width: 320px;
+    height: 225px;
+    margin: 10px;
+    padding: 10px;
+    border: 3px solid rgb(140, 140, 245);
+    border-radius: 7px;
+}
+
+.from-cards{
+    display: flex;
+    justify-content: center;
+}
+
+form{
+    width: 300px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+textarea{
+    height: 100px;
+    resize: none;
+}
+
+.forma{
+    display: flex;
+    justify-content: center;
+}
+.center{
+    display: flex;
+    justify-content: center;
+}
