@@ -33,6 +33,17 @@ Vue.component('notes',{
             this.notes1.push(formCards)
                
         })
+        eventBus.$on('MoveToTwo', formCards => {
+            this.notes2.push(formCards)
+        })
+    
+        eventBus.$on('MoveToThree', formCards => {
+            this.notes3.push(formCards)
+        })
+    
+        eventBus.$on('MoveToFour', formCards => {
+            this.notes4.push(formCards)
+        })
     },
 })
 
@@ -44,10 +55,18 @@ Vue.component('colOne', {
     <div class="col">
         <cards
             v-for="formCards in cardList"
-            :formCards="formCards">
+            :formCards="formCards"
+            :MoveCard="MoveCard">>
         </cards>
     </div>
     `,
+    methods: {
+
+        MoveCard(formCards) {
+            eventBus.$emit('MoveToTwo', formCards)
+            this.cardList.splice(this.cardList.indexOf(formCards), 1);
+        }
+    }
 })
 
 Vue.component('colTwo', {
@@ -58,10 +77,18 @@ Vue.component('colTwo', {
     <div class="col">
         <cards
             v-for="formCards in cardList"
-            :formCards="formCards">
+            :formCards="formCards"
+            :MoveCard="MoveCard">
         </cards>
     </div>
     `,
+    methods: {
+
+        MoveCard(formCards) {
+            eventBus.$emit('MoveToThree', formCards);
+            this.cardList.splice(this.cardList.indexOf(formCards), 1);
+        }
+    }
 })
 
 Vue.component('colThree', {
@@ -72,10 +99,18 @@ Vue.component('colThree', {
     <div class="col">
     <cards
         v-for="formCards in cardList"
-        :formCards="formCards">
+        :formCards="formCards"
+        :MoveCard="MoveCard">
     </cards>
 </div>
 `,
+methods: {
+
+    MoveCard(formCards) {
+        eventBus.$emit('MoveToFour', formCards);
+        this.cardList.splice(this.cardList.indexOf(formCards), 1);
+    } 
+}
 })
 
 Vue.component('colFour', {
@@ -92,7 +127,7 @@ Vue.component('colFour', {
     `,
 })
 
-Vue.component('card-redact',{
+Vue.component('card-edit',{
     template:`
     <div class="notes1">
     <button type="submit" v-if="show === false" @click="$emit('Edit', isEdit())">Редактирование</button>
@@ -101,7 +136,7 @@ Vue.component('card-redact',{
             <input v-model="names" id="names" type="text" :placeholder="formCards.names">
             <textarea v-model="description" :placeholder="formCards.description"></textarea>
             <p>Deadline: {{ formCards.deadline }}</p>
-            <p>Дата создания: {{ formCards.dateCreate }}</p>
+            <p>Дата создания: {{ formCards.date }}</p>
             <button type="submit" @click="$emit('Edit', isEdit())">Да</button>
             <button type="submit" @click="$emit('Edit', show = false)">Нет</button>
         </form>
@@ -137,40 +172,32 @@ Vue.component('card-redact',{
 })
 
 Vue.component('cards', {
-    props:{
-        formCards: Object,
-        edit: Boolean
-    },
+
     template:
         `
+        <div class="color">
         <div class="notes1">
             <div class="conc" v-if="edit === false">
                 <p>{{formCards.names}}</p>
                 <p>{{formCards.description}}</p>
                 <p>Дедлайн:{{formCards.deadline}}</p>
                 <p>Дата создания:{{formCards.date}}</p>
-                <button type="submit">
+                <button type="submit"  @click="MoveCard(formCards)">
                 Переместить
                 </button>
-                <card-redact :formCards="formCards" @Edit="edit = $event"></card-redact>
-                </div>
-                
             </div>
+            <card-edit :formCards="formCards" @Edit="edit = $event"></card-edit>
         </div>  
+        </div>
     `,
-
+    props:{
+        formCards: Object,
+        edit: Boolean,
+        MoveCard: Function
+    },
 })
 
 Vue.component('form-cards', {
-    data(){
-        return{
-            names: null,
-            description: null,
-            deadline: null,
-            date: null,
-            errors:[]
-        }
-    },
 
     template:
     `
@@ -194,6 +221,16 @@ Vue.component('form-cards', {
             
         </div>
     `,
+    data(){
+        return{
+            names: null,
+            description: null,
+            deadline: null,
+            date: null,
+            errors:[]
+        }
+    },
+
      methods:{
         onForm(){
             if(this.names && this.description && this.deadline){

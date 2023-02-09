@@ -15,12 +15,13 @@
     justify-content: space-between;
 }
 
+
 .row {
     display: flex;
     justify-content: center;
 }
 
-.conc{
+.color{
     margin: 10px;
     padding: 10px;
     border: 3px solid rgb(140, 140, 245);
