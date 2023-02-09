@@ -77,3 +77,35 @@ textarea{
     display: flex;
     justify-content: center;
 }
+
+.label{
+    margin: 3px;
+}
+.names{
+    border:2px solid #6162AD;
+    margin: 3px;
+}
+.deadline{
+    border:2px solid #6162AD;
+    margin: 3px;
+}
+.description{
+    border:2px solid #6162AD;
+    margin: 3px;
+}
+.submit{
+    border:2px solid #6162AD;
+    margin: 3px;
+}
+
+.conc{
+    margin: 10px;
+    padding: 10px;
+    border: 3px solid rgb(140, 140, 245);
+}
+
+.text{
+    display: flex;
+    justify-content: center;
+    color: #6162AD;
+}
