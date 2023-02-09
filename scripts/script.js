@@ -44,6 +44,9 @@ Vue.component('notes',{
         eventBus.$on('MoveToFour', formCards => {
             this.notes4.push(formCards)
         })
+        eventBus.$on('DeleteCard', formCards => {
+            this.notes1.splice(this.notes1.indexOf(formCards), 1);
+        })
     },
 })
 
@@ -56,7 +59,8 @@ Vue.component('colOne', {
         <cards
             v-for="formCards in cardList"
             :formCards="formCards"
-            :MoveCard="MoveCard">>
+            :MoveCard="MoveCard"
+            :del="true">
         </cards>
     </div>
     `,
@@ -163,7 +167,6 @@ Vue.component('card-edit',{
             show: false,
             names: this.formCards.names,
             description: this.formCards.description,
-            reason: this.formCards.reason,
         }
     },
     props: {
@@ -174,14 +177,11 @@ Vue.component('card-edit',{
             if (this.show == false)
                 this.show = true;
             else {
-                if (this.names)
+                if (this.names !="")
                     this.formCards.names = this.names;
 
-                if (this.description)
+                if (this.description !="")
                     this.formCards.description = this.description;
-
-                if (this.reason)
-                    this.formCards.description = this.reason;
 
                 this.formCards.dateEdit = new Date().toLocaleString();
 
@@ -204,12 +204,13 @@ Vue.component('cards', {
                 <p>{{formCards.description}}</p>
                 <p>Дедлайн:{{formCards.deadline}}</p>
                 <p v-if="formCards.dateEdit != null">Редактирование: {{ formCards.dateEdit }}</p>
-                <p v-if="last != true && formCards.reason != null || formCards.reason != ''">Причина возврата: {{ formCards.reason }}</p>
+                <p v-if="last != true && formCards.reason != null && formCards.reason != ''">Причина возврата: {{ formCards.reason }}</p>
                 <p>Дата создания:{{formCards.date}}</p>
                 <p v-if="formCards.completed != null">Карточка:  {{ formCards.completed ? 'Просрочен' : 'Выполнен' }}</p>
                 <button type="submit" @click="MoveCard(formCards)"  v-if="formCards.completed === null">
                 Переместить
                 </button>
+                <button type="submit" v-if="del === true" @click="DeleteCard(formCards)">Удалить</button>
                 <add-reason
                     v-if="last === true && formCards.completed === null"
                     :formCards="formCards"
@@ -225,7 +226,14 @@ Vue.component('cards', {
         edit: Boolean,
         MoveCard: Function,
         last: Boolean,
+        del: Boolean,
     },
+    methods: {
+
+        DeleteCard(formCards) {
+            eventBus.$emit('DeleteCard', formCards);
+        }
+    }
 })
 
 Vue.component('add-reason', {
