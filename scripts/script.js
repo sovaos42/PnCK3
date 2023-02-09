@@ -14,20 +14,13 @@ Vue.component('notes',{
     `
     <div class="all">
         <div class="all-notes">
-            <div class="row" >
-                <div class="note1">
-                    <cards v-for="formCards in notes1" :formCards="formCards"></cards>
-                </div>
-                <div class="note2">
-                    <cards></cards>
-                </div>
-                <div class="note3">
-                    <cards></cards>
-                </div>
-                <div class="note4">
-                    <cards></cards>
-                </div>
-            </div>
+
+        <div class="row-col">
+            <colOne :cardList="notes1"></colOne>
+            <colTwo :cardList="notes2"></colTwo>
+            <colThree :cardList="notes3"></colThree>
+            <colFour :cardList="notes4"></colFour>
+        </div>
             <div class="forma">
             <form-cards></form-cards>
             </div>
@@ -43,18 +36,125 @@ Vue.component('notes',{
     },
 })
 
+Vue.component('colOne', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <cards
+            v-for="formCards in cardList"
+            :formCards="formCards">
+        </cards>
+    </div>
+    `,
+})
+
+Vue.component('colTwo', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <cards
+            v-for="formCards in cardList"
+            :formCards="formCards">
+        </cards>
+    </div>
+    `,
+})
+
+Vue.component('colThree', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+    <cards
+        v-for="formCards in cardList"
+        :formCards="formCards">
+    </cards>
+</div>
+`,
+})
+
+Vue.component('colFour', {
+    props: {
+        cardList: [],
+    },
+    template: `
+    <div class="col">
+        <cards
+            v-for="formCards in cardList"
+            :formCards="formCards">
+        </cards>
+    </div>
+    `,
+})
+
+Vue.component('card-redact',{
+    template:`
+    <div class="notes1">
+    <button type="submit" v-if="show === false" @click="$emit('Edit', isEdit())">Редактирование</button>
+        <form class="text-form-card" v-if="show === true">
+            <label for="names">Редактирование</label>
+            <input v-model="names" id="names" type="text" :placeholder="formCards.names">
+            <textarea v-model="description" :placeholder="formCards.description"></textarea>
+            <p>Deadline: {{ formCards.deadline }}</p>
+            <p>Дата создания: {{ formCards.dateCreate }}</p>
+            <button type="submit" @click="$emit('Edit', isEdit())">Да</button>
+            <button type="submit" @click="$emit('Edit', show = false)">Нет</button>
+        </form>
+    </div>
+    `,
+    data() {
+        return {
+            show: false,
+            names: this.formCards.names,
+            description: this.formCards.description,
+        }
+    },
+    props: {
+        formCards: Object,
+    },
+    methods: {
+        isEdit() {
+            if (this.show == false)
+                this.show = true;
+            else {
+                if (this.names)
+                    this.formCards.names = this.names;
+
+                if (this.description)
+                    this.formCards.description = this.description;
+
+                this.show = false;
+            }
+
+            return this.show;
+        }
+    },
+})
+
 Vue.component('cards', {
     props:{
-        formCards: Object
+        formCards: Object,
+        edit: Boolean
     },
     template:
         `
-        <div class="card">
-            <div class="conc" >
+        <div class="notes1">
+            <div class="conc" v-if="edit === false">
                 <p>{{formCards.names}}</p>
                 <p>{{formCards.description}}</p>
                 <p>Дедлайн:{{formCards.deadline}}</p>
                 <p>Дата создания:{{formCards.date}}</p>
+                <button type="submit">
+                Переместить
+                </button>
+                <card-redact :formCards="formCards" @Edit="edit = $event"></card-redact>
+                </div>
+                
             </div>
         </div>  
     `,
@@ -77,7 +177,7 @@ Vue.component('form-cards', {
         </div>
         <div class="all-form-cards">
         <div class="center">
-            <form> 
+            <form @submit.prevent="onForm"> 
                 <label for="names"> Заголовок </label>
                 <input v-model="names" id="names" type="text" placeholder="names"><br>
                 <textarea v-model="description"  placeholder="description"></textarea>
@@ -101,7 +201,9 @@ Vue.component('form-cards', {
                     names: this.names,
                     description: this.description,
                     deadline: this.deadline,
-                    date: new Date().toLocaleString()
+                    date: new Date().toLocaleString(),
+                    reason: null,
+                    completed: null,
                 }
                 eventBus.$emit('notes-form', formCards)
 
