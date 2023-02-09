@@ -100,15 +100,22 @@ Vue.component('colThree', {
     <cards
         v-for="formCards in cardList"
         :formCards="formCards"
-        :MoveCard="MoveCard">
+        :MoveCard="MoveCard"
+        :last="true">
     </cards>
 </div>
 `,
 methods: {
 
-    MoveCard(formCards) {
-        eventBus.$emit('MoveToFour', formCards);
-        this.cardList.splice(this.cardList.indexOf(formCards), 1);
+    MoveCard(formCards, last) {
+        if(last === undefined){
+            eventBus.$emit('MoveToFour', formCards);
+            this.cardList.splice(this.cardList.indexOf(formCards), 1);
+        }
+        else{
+            eventBus.$emit('MoveToTwo', formCards);
+            this.cardList.splice(this.cardList.indexOf(formCards), 1);
+        }
     } 
 }
 })
@@ -147,6 +154,7 @@ Vue.component('card-edit',{
             show: false,
             names: this.formCards.names,
             description: this.formCards.description,
+            reason: this.formCards.reason,
         }
     },
     props: {
@@ -162,6 +170,11 @@ Vue.component('card-edit',{
 
                 if (this.description)
                     this.formCards.description = this.description;
+
+                if (this.reason)
+                    this.formCards.description = this.reason;
+
+                this.formCards.dateEdit = new Date().toLocaleString();
 
                 this.show = false;
             }
@@ -181,10 +194,17 @@ Vue.component('cards', {
                 <p>{{formCards.names}}</p>
                 <p>{{formCards.description}}</p>
                 <p>Дедлайн:{{formCards.deadline}}</p>
+                <p v-if="formCards.dateEdit != null">Редактирование: {{ formCards.dateEdit }}</p>
+                <p v-if="last != true && formCards.reason != null || formCards.reason != ''">Причина возврата: {{ formCards.reason }}</p>
                 <p>Дата создания:{{formCards.date}}</p>
                 <button type="submit"  @click="MoveCard(formCards)">
                 Переместить
                 </button>
+                <add-reason
+                    v-if="last === true"
+                    :formCards="formCards"
+                    :MoveCard="MoveCard">
+                </add-reason>
             </div>
             <card-edit :formCards="formCards" @Edit="edit = $event"></card-edit>
         </div>  
@@ -193,7 +213,26 @@ Vue.component('cards', {
     props:{
         formCards: Object,
         edit: Boolean,
-        MoveCard: Function
+        MoveCard: Function,
+        last: Boolean,
+    },
+})
+
+Vue.component('add-reason', {
+    props: {
+        formCards: Object,
+        MoveCard: Function,
+    },
+    template: `
+    <form class="text-form-card" @submit.prevent="MoveCard(formCards, true)">
+        <textarea v-model="formCards.reason" :placeholder="formCards.reason"></textarea>
+        <button type="submit" :disabled="formCards.reason == null || formCards.reason == ''">Вернуть</button>
+    </form>
+    `,
+    data() {
+        return {
+            reason: this.formCards.reason,
+        }
     },
 })
 
